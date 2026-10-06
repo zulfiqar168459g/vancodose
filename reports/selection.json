@@ -1,0 +1,9 @@
+{
+  "apriori_model": "lasso",
+  "params": {
+    "alpha": 1.0177147839125959e-05
+  },
+  "tdm_method": "bayesian_map",
+  "curve_method": "mechanistic_two_compartment",
+  "rule": "lowest CV MAE; linear model preferred within 2%"
+}

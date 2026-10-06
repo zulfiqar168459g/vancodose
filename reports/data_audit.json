@@ -1,0 +1,143 @@
+{
+  "excluded_outliers": "Patients with SCr > 3.5 mg/dL removed before all analyses (6 patients)",
+  "counts": {
+    "patients": 394,
+    "regimens": 1182,
+    "profile_rows": 1022430
+  },
+  "missing_values": 0,
+  "duplicates": {
+    "patient_id": 0,
+    "regimen_id": 0,
+    "profile_time": 0
+  },
+  "referential_integrity": {
+    "regimens_without_patient": 0,
+    "profiles_without_regimen": 0,
+    "regimens_per_patient": {
+      "3": 394
+    },
+    "points_per_profile": {
+      "865": 1182
+    }
+  },
+  "identities": {
+    "AUC24 == daily_dose / true_CL (max rel. error)": 3.6637842314456264e-05,
+    "AUC_MIC_ratio == AUC24 / MIC": true,
+    "daily_dose == dose * 24 / interval": true,
+    "CrCL == Cockcroft-Gault(total body weight)": true,
+    "obesity_flag == (BMI >= 30)": true
+  },
+  "leakage_signals": {
+    "corr(log daily dose, log true CL) auc_targeted": 0.8658167387238394,
+    "corr(log daily dose, log true CL) standard": 0.39874886417405453
+  },
+  "assay_noise_sd_by_true_conc": {
+    "(-1.0, 0.01]": 0.947,
+    "(0.01, 5.0]": 1.584,
+    "(5.0, 10.0]": 1.995,
+    "(10.0, 20.0]": 2.841,
+    "(20.0, 40.0]": 4.521,
+    "(40.0, 80.0]": 7.898,
+    "(80.0, 10000.0]": 13.581
+  },
+  "extreme_values_3IQR": {
+    "CrCL_ml_min": 4,
+    "ICU_flag": 59,
+    "RRT_flag": 9,
+    "ARC_flag": 35,
+    "MIC_mg_l": 134,
+    "true_CL_L_h": 10,
+    "true_CL_residual_L_h": 10,
+    "true_CL_dialysis_L_h": 9,
+    "true_Vd2_L": 12,
+    "true_Q_L_h": 3,
+    "true_ke_per_h": 4,
+    "true_alpha_per_h": 4,
+    "true_beta_per_h": 8,
+    "true_tHalf_beta_h": 8,
+    "true_AUC24_ss_mg_h_L": 6
+  },
+  "ranges": {
+    "age": [
+      18.0,
+      100.0
+    ],
+    "weight_kg": [
+      40.0,
+      147.2819
+    ],
+    "height_cm": [
+      138.74,
+      195.92
+    ],
+    "SCr_mg_dl": [
+      0.3,
+      3.4338
+    ],
+    "CrCL_ml_min": [
+      11.81,
+      397.57
+    ]
+  },
+  "auc_by_regimen_type": {
+    "auc_targeted": {
+      "count": 394.0,
+      "mean": 622.4,
+      "std": 337.3,
+      "min": 202.3,
+      "25%": 451.1,
+      "50%": 522.7,
+      "75%": 593.7,
+      "max": 2215.9
+    },
+    "loading": {
+      "count": 394.0,
+      "mean": 986.7,
+      "std": 820.1,
+      "min": 77.7,
+      "25%": 461.7,
+      "50%": 732.5,
+      "75%": 1279.2,
+      "max": 6748.0
+    },
+    "standard": {
+      "count": 394.0,
+      "mean": 982.3,
+      "std": 782.2,
+      "min": 80.6,
+      "25%": 439.6,
+      "50%": 771.6,
+      "75%": 1217.4,
+      "max": 5860.5
+    }
+  },
+  "phenotypes": {
+    "sex": {
+      "M": 239,
+      "F": 155
+    },
+    "ICU_flag": {
+      "0": 335,
+      "1": 59
+    },
+    "RRT_flag": {
+      "0": 385,
+      "1": 9
+    },
+    "ARC_flag": {
+      "0": 359,
+      "1": 35
+    },
+    "MIC_mg_l": {
+      "1.0": 260,
+      "2.0": 79,
+      "0.5": 39,
+      "4.0": 16
+    }
+  },
+  "split_sizes": {
+    "dev": 314,
+    "test": 80
+  }
+}

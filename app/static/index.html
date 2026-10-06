@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VancoDose</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<meta name="theme-color" content="#844BFF">
+<link rel="stylesheet" href="/static/styles.css">
+<script src="/static/chart.umd.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="#patients" data-view="patients" aria-label="VancoDose home">
+    <img src="/static/favicon.svg" alt="" width="30" height="30">
+    <span><strong>VancoDose</strong><small>Vancomycin precision dosing</small></span>
+  </a>
+  <nav class="tabs" aria-label="Main">
+    <button class="tab" data-view="patients">Search Patient by ID</button>
+    <button class="tab" data-view="dosing">Dose calculator</button>
+    <button class="tab" data-view="analytics">Population analytics</button>
+    <button class="tab" data-view="model">Model &amp; evidence</button>
+  </nav>
+  <div class="top-actions">
+    <span class="pill" title="All patients are simulated. Not for clinical use.">Synthetic data, research use</span>
+    <button class="icon-btn" id="help-btn" aria-label="Open the glossary" title="Glossary (?)">?</button>
+  </div>
+</header>
+
+<main id="main">
+<!-- ======================= PATIENTS ======================= -->
+<section id="view-patients" class="view">
+  <div class="search-wrap">
+    <label for="pt-search" class="search-label">Find a patient</label>
+    <div class="combo" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="pt-list">
+      <svg class="search-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="pt-search" type="text" autocomplete="off" spellcheck="false" placeholder="Type a patient ID, for example 00028, or pick from the list" aria-autocomplete="list" aria-controls="pt-list">
+      <kbd class="kbd" aria-hidden="true">/</kbd>
+      <ul id="pt-list" role="listbox" hidden></ul>
+    </div>
+    <div class="quick" id="pt-quick"></div>
+  </div>
+
+  <div id="pt-empty" class="pt-empty">
+    <h1>Follow a patient from first dose to the next decision</h1>
+    <p>Pick a patient to see every course of vancomycin they received, how their levels responded, why each dose was changed, and what VancoDose recommends next.</p>
+    <ol class="journey-legend">
+      <li><b>Condition</b><span>Kidney function, weight and ICU status at the time</span></li>
+      <li><b>Dose</b><span>The regimen given in that course</span></li>
+      <li><b>Response</b><span>Measured levels and the exposure they imply</span></li>
+      <li><b>Reason</b><span>Why the dose was kept or changed</span></li>
+      <li><b>Next dose</b><span>The recommendation, with the factors behind it</span></li>
+    </ol>
+  </div>
+
+  <div id="pt-view" hidden></div>
+</section>
+
+<!-- ======================= DOSING ======================= -->
+<section id="view-dosing" class="view">
+  <div class="page-head">
+    <h1>Dose calculator</h1>
+    <p class="muted">Quick what-if for any patient, without saving to a record. To keep a history, use Search Patient by ID.</p>
+  </div>
+  <div class="layout">
+    <form id="form" class="panel inputs" novalidate>
+      <div class="panel-head">
+        <h2>Patient and regimen</h2>
+        <select id="example" aria-label="Load an example patient"><option value="">Load an example</option></select>
+      </div>
+      <fieldset>
+        <legend><span class="num">1</span>Patient</legend>
+        <div class="grid2">
+          <label><span class="lab">Age <span class="unit">years</span></span><input name="age" type="number" min="18" max="110" step="any" required></label>
+          <label><span class="lab">Sex</span><select name="sex"><option value="M">Male</option><option value="F">Female</option></select></label>
+          <label><span class="lab">Weight <span class="unit">kg</span></span><input name="weight_kg" type="number" min="25" max="300" step="any" required></label>
+          <label><span class="lab">Serum creatinine <span class="unit">mg/dL</span></span><input name="SCr_mg_dl" type="number" min="0.1" max="15" step="any" required></label>
+        </div>
+        <p class="derived" id="crcl">Creatinine clearance: enter age, weight and creatinine</p>
+        <div class="toggles">
+          <label class="check"><input type="checkbox" name="ICU_flag"> ICU admission</label>
+          <label class="check"><input type="checkbox" name="ARC_flag"> Augmented renal clearance</label>
+          <label class="check"><input type="checkbox" name="RRT_flag"> Renal replacement therapy</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend><span class="num">2</span>Regimen</legend>
+        <div class="grid2">
+          <label><span class="lab">Dose <span class="unit">mg</span></span><input name="dose_mg" type="number" min="100" max="4000" step="any" required></label>
+          <label><span class="lab">Every <span class="unit">hours</span></span><input name="interval_h" type="number" min="4" max="48" step="any" required></label>
+          <label><span class="lab">Infusion time <span class="unit">hours</span></span><input name="infusion_duration_h" type="number" min="0.5" max="24" step="any" required></label>
+          <label><span class="lab">Loading dose <span class="unit">mg, optional</span></span><input name="loading_dose_mg" type="number" min="0" max="4000" step="any" placeholder="0"></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend><span class="num">3</span>Measured levels <span class="optional">optional, improves accuracy</span></legend>
+        <p class="hint">Hours after the first dose of this regimen. A peak about 1 h after an infusion ends, plus the next trough, works best.</p>
+        <div id="levels"></div>
+        <button type="button" class="link" id="add-level">Add a level</button>
+      </fieldset>
+      <details class="target">
+        <summary>Target AUC24 range: <b id="target-text">400–600 mg·h/L</b></summary>
+        <div class="grid2">
+          <label><span class="lab">Lower <span class="unit">mg·h/L</span></span><input id="t-lo" type="number" value="400" min="100" max="1500"></label>
+          <label><span class="lab">Upper <span class="unit">mg·h/L</span></span><input id="t-hi" type="number" value="600" min="100" max="1500"></label>
+        </div>
+      </details>
+      <div id="form-error" class="form-error" role="alert" hidden></div>
+      <button type="submit" class="btn primary block" id="calc">Calculate exposure</button>
+    </form>
+    <div class="results" id="results" aria-live="polite">
+      <div class="empty" id="empty">
+        <h2>Enter a patient and a regimen</h2>
+        <p class="muted">You will see the predicted AUC24, where it sits against the target, a recommended regimen and the reasons behind it. Choose <em>Load an example</em> to try a held-out test patient with measured levels.</p>
+      </div>
+      <div id="out" hidden></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ANALYTICS ======================= -->
+<section id="view-analytics" class="view">
+  <div class="page-head"><h1>Population analytics</h1><p class="muted" id="an-note"></p></div>
+  <div class="kpis" id="an-kpis"></div>
+  <div class="grid-charts">
+    <article class="panel"><h3>AUC24 with standard dosing</h3><p class="muted small">Patients per exposure band, coloured by clinical category.</p><div class="chart-box"><canvas id="ch-hist"></canvas></div></article>
+    <article class="panel"><h3>Target attainment by patient group</h3><p class="muted small">Share of each group below, within and above 400–600 mg·h/L.</p><div class="chart-box"><canvas id="ch-groups"></canvas></div></article>
+    <article class="panel"><h3>Peak and trough at steady state</h3><p class="muted small" id="pt-note"></p><div class="chart-box"><canvas id="ch-pt"></canvas></div></article>
+    <article class="panel"><h3>Which dosing strategy reaches the target?</h3><p class="muted small">80 held-out patients; each strategy's true exposure in the simulator.</p><div class="chart-box"><canvas id="ch-strat"></canvas></div></article>
+  </div>
+  <article class="panel"><h3>Risk by kidney function</h3><div id="an-risk"></div></article>
+</section>
+
+<!-- ======================= MODEL ======================= -->
+<section id="view-model" class="view">
+  <div class="page-head"><h1>Model &amp; evidence</h1><p class="muted">How predictions are made, how accurate they are on 80 patients never used for training, and where they stop working.</p></div>
+  <div id="model-body"></div>
+</section>
+</main>
+
+<aside id="glossary" class="drawer" hidden aria-labelledby="gl-title">
+  <div class="drawer-head"><h2 id="gl-title">Glossary</h2><button class="icon-btn" id="gl-close" aria-label="Close glossary">×</button></div>
+  <dl>
+    <dt>AUC24</dt><dd>Total vancomycin exposure over 24 hours at steady state (mg·h/L). The 2020 consensus guideline targets 400–600 when the MIC is 1 mg/L.</dd>
+    <dt>Above 800 mg·h/L</dt><dd>Exposure associated with a higher risk of acute kidney injury.</dd>
+    <dt>Peak and trough</dt><dd>Highest concentration (end of infusion) and lowest concentration (just before the next dose), in mg/L.</dd>
+    <dt>Clearance</dt><dd>How fast the patient removes vancomycin (L/h). AUC24 = daily dose ÷ clearance, so clearance drives every dosing decision.</dd>
+    <dt>Covariate-only estimate</dt><dd>A prediction from age, weight, kidney function and ICU status alone, used before any levels are available.</dd>
+    <dt>Bayesian estimate</dt><dd>The covariate estimate updated with the patient's own measured levels through a two-compartment pharmacokinetic model.</dd>
+    <dt>Chance within target</dt><dd>Probability that the true AUC24 falls inside the target range, given the uncertainty of the estimate.</dd>
+    <dt>Course</dt><dd>A period on one regimen. A new course starts whenever the dose, interval or infusion time changes.</dd>
+    <dt>Simulated levels</dt><dd>For these synthetic patients only: follow-up levels generated from the simulator so the journey can be explored. Real levels replace them in practice.</dd>
+  </dl>
+  <p class="muted small">Keyboard: <kbd>/</kbd> search patients, <kbd>?</kbd> glossary, <kbd>Esc</kbd> close.</p>
+</aside>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<footer>Research prototype built on a synthetic cohort of 394 simulated patients. It supports review and does not prescribe treatment.</footer>
+</body>
+</html>

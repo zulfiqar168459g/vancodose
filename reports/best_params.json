@@ -1,0 +1,48 @@
+{
+  "ridge": {
+    "alpha": 1.2519135542021322
+  },
+  "lasso": {
+    "alpha": 1.0177147839125959e-05
+  },
+  "elastic_net": {
+    "alpha": 0.003525188767874714,
+    "l1_ratio": 0.05423621451179898
+  },
+  "random_forest": {
+    "max_depth": 5,
+    "min_samples_leaf": 1,
+    "max_features": 0.9975942865575479
+  },
+  "extra_trees": {
+    "max_depth": 8,
+    "min_samples_leaf": 1,
+    "max_features": 0.8216349412011354
+  },
+  "xgboost": {
+    "n_estimators": 1000,
+    "learning_rate": 0.018447984856322912,
+    "max_depth": 2,
+    "min_child_weight": 3.681474696334159,
+    "subsample": 0.884553623197127,
+    "colsample_bytree": 0.4527168293265619,
+    "reg_lambda": 3.342523086025733,
+    "reg_alpha": 0.0007114206784778228
+  },
+  "lightgbm": {
+    "n_estimators": 500,
+    "learning_rate": 0.008936840429594556,
+    "num_leaves": 20,
+    "min_child_samples": 11,
+    "subsample": 0.818994621407648,
+    "colsample_bytree": 0.6103134125316559,
+    "reg_lambda": 0.018461325728321133,
+    "subsample_freq": 1
+  },
+  "mlp": {
+    "width": 64,
+    "depth": 2,
+    "alpha": 0.6761654017064916,
+    "learning_rate_init": 0.005066027115003447
+  }
+}

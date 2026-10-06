@@ -1,0 +1,14 @@
+# Local environments and tools
+.venv/
+.venv-*/
+.tools/
+logs/
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+# Local patient history (created by the app)
+data/patient_history.db
+# OS
+.DS_Store
+Thumbs.db

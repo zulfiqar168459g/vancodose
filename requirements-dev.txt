@@ -1,0 +1,9 @@
+# Model comparison (python -m vanco.experiments) and tests
+-r requirements.txt
+shap==0.52.0
+lightgbm==4.7.0
+xgboost==3.4.1
+optuna==5.0.0
+torch==2.14.1
+pytest==9.1.1
+httpx

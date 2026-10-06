@@ -1,0 +1,97 @@
+# Proves the one-click launchers work on fresh Windows, macOS and Linux machines:
+# install everything, prepare the model, start VancoDose, and make real API calls.
+name: Launcher test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows (Start VancoDose.bat)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Python installer path (python.org, signature check, per-user install)
+        shell: powershell
+        run: |
+          . .\scripts\start-vancodose.ps1
+          if (-not (Install-Python)) { throw 'Install-Python failed' }
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'
+          if (-not (Test-Python $exe)) { throw "Installed Python not usable at $exe" }
+          & $exe --version
+
+      - name: Install and verify through the launcher
+        shell: cmd
+        run: call "Start VancoDose.bat" -NoShortcut --check
+
+      - name: Start VancoDose and call the API
+        shell: powershell
+        run: |
+          $p = Start-Process -FilePath "$PWD\Start VancoDose.bat" -ArgumentList '-NoShortcut', '--no-browser', '--port', '8123' -PassThru -WindowStyle Hidden
+          $r = $null
+          for ($i = 0; $i -lt 90 -and -not $r; $i++) { try { $r = Invoke-RestMethod http://127.0.0.1:8123/api/health } catch { Start-Sleep 2 } }
+          if (-not $r.ready) { Get-Content logs\launcher.log -Tail 60; Get-Content logs\server.log -Tail 60; throw 'VancoDose did not start' }
+          $body = '{"patient":{"age":60,"sex":"M","weight_kg":80,"SCr_mg_dl":1.0},"regimen":{"dose_mg":1000,"interval_h":12,"infusion_duration_h":1}}'
+          $pred = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8123/api/predict -ContentType 'application/json' -Body $body
+          "Predicted AUC24: $($pred.auc24)"
+          $pt = Invoke-RestMethod http://127.0.0.1:8123/api/patients/VANCO_00028
+          "Patient journey courses: $($pt.courses.Count); next: $($pt.next.recommendation.best.label)"
+          if (-not ($pred.auc24 -gt 0) -or $pt.courses.Count -lt 1) { throw 'API check failed' }
+          (Invoke-WebRequest http://127.0.0.1:8123/ -UseBasicParsing).StatusCode
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*uvicorn app.server*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+
+      - name: Show launcher log
+        if: always()
+        shell: powershell
+        run: |
+          foreach ($f in 'logs\launcher.log', 'logs\server.log') {
+            if (Test-Path $f) {
+              Get-Content $f -Tail 80
+              $tail = (Get-Content $f -Tail 40) -join '%0A'
+              Write-Output "::warning title=$f (last 40 lines)::$tail"
+            }
+          }
+
+  unix:
+    name: ${{ matrix.os }} (Start VancoDose.command)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install and verify through the launcher
+        run: bash "Start VancoDose.command" --check
+
+      - name: Start VancoDose and call the API
+        run: |
+          bash "Start VancoDose.command" --no-browser --port 8123 > run.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:8123/api/health && break; sleep 2; done
+          curl -sf http://127.0.0.1:8123/api/health || { tail -60 logs/launcher.log; tail -60 logs/server.log; exit 1; }
+          curl -sf -X POST http://127.0.0.1:8123/api/predict -H 'Content-Type: application/json' \
+            -d '{"patient":{"age":60,"sex":"M","weight_kg":80,"SCr_mg_dl":1.0},"regimen":{"dose_mg":1000,"interval_h":12,"infusion_duration_h":1}}' \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); print('Predicted AUC24', round(d['auc24'])); assert d['auc24'] > 0"
+          curl -sf http://127.0.0.1:8123/api/patients/VANCO_00028 | python3 -c "import json,sys; d=json.load(sys.stdin); print('courses', len(d['courses'])); assert d['courses']"
+          pkill -f "uvicorn app.server" || true
+
+  tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt pytest httpx
+      - run: python -m pytest -q

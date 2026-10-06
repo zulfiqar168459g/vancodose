@@ -1,0 +1,169 @@
+{
+  "created": "2026-10-06T19:11:23+00:00",
+  "selection": {
+    "apriori_model": "lasso",
+    "params": {
+      "alpha": 1.0177147839125959e-05
+    },
+    "tdm_method": "bayesian_map",
+    "curve_method": "mechanistic_two_compartment",
+    "rule": "lowest CV MAE; linear model preferred within 2%"
+  },
+  "training_patients": 394,
+  "error_model": [
+    1.569199854454683,
+    0.15108388197154018
+  ],
+  "omega_sd": [
+    0.2663201923803928,
+    0.14984711546020243,
+    0.9477151337731257,
+    0.4591005861715655
+  ],
+  "test_metrics": {
+    "a_priori_given_regimens": {
+      "MAE": 209.96934013117578,
+      "RMSE": 285.10219687557486,
+      "R2": 0.839970196934144,
+      "MdAPE_%": 21.154220962434405,
+      "bias": -35.08891511790978,
+      "n": 160,
+      "category_agreement": 0.8125
+    },
+    "bayes_trough_given_regimens": {
+      "MAE": 154.79672421648354,
+      "RMSE": 228.63934799085462,
+      "R2": 0.8970795469883079,
+      "MdAPE_%": 14.168617066529338,
+      "bias": -37.20676810998215,
+      "n": 160,
+      "category_agreement": 0.8625
+    },
+    "bayes_peak_trough_given_regimens": {
+      "MAE": 151.1854711731002,
+      "RMSE": 229.27339913323863,
+      "R2": 0.8965079278434687,
+      "MdAPE_%": 13.22742812963077,
+      "bias": -33.85348712486529,
+      "n": 160,
+      "category_agreement": 0.86875
+    },
+    "a_priori_target_range_regimens": {
+      "MAE": 146.98401958750026,
+      "RMSE": 182.7622145002221,
+      "R2": 0.7140004750590925,
+      "MdAPE_%": 21.154463348826656,
+      "bias": 16.963967642561876,
+      "n": 80,
+      "category_agreement": 0.6
+    },
+    "bayes_peak_trough_target_range_regimens": {
+      "MAE": 84.51620938685687,
+      "RMSE": 106.08148632555637,
+      "R2": 0.903645571352912,
+      "MdAPE_%": 12.571720914198576,
+      "bias": 10.67091953249954,
+      "n": 80,
+      "category_agreement": 0.7375
+    },
+    "bayes_two_pairs_given_regimens": {
+      "MAE": 130.80442550042181,
+      "RMSE": 196.24332520930312,
+      "R2": 0.9241789959285236,
+      "MdAPE_%": 10.2681859517593,
+      "bias": -19.724093788123216,
+      "n": 160,
+      "category_agreement": 0.88125
+    },
+    "bayes_two_pairs_target_range_regimens": {
+      "MAE": 80.06716360186905,
+      "RMSE": 103.7622730542765,
+      "R2": 0.9078126263657454,
+      "MdAPE_%": 11.47768388051929,
+      "bias": 1.2242922551082143,
+      "n": 80,
+      "category_agreement": 0.725
+    },
+    "goal": {
+      "MAE": 90.0,
+      "RMSE": 100.0
+    },
+    "steady_state_peak_bayes": {
+      "MAE": 6.478243865819124,
+      "RMSE": 9.478351804087627,
+      "R2": 0.9005910442513179,
+      "MdAPE_%": 11.078247180770274,
+      "bias": -1.140561110869276,
+      "n": 160
+    },
+    "steady_state_trough_bayes": {
+      "MAE": 6.238608461799492,
+      "RMSE": 9.618623190018193,
+      "R2": 0.8889888228188293,
+      "MdAPE_%": 17.072676520705844,
+      "bias": -1.5995605175738874,
+      "n": 160
+    },
+    "curve_MAE_mg_L_bayes": 2.2165233644870836,
+    "curve_MAE_mg_L_prior": 3.862202121412203,
+    "bayes_80pct_interval_coverage": 0.79375,
+    "a_priori_80pct_interval_coverage": 0.725,
+    "target_attainment": {
+      "recommended_a_priori_prediction_error": {
+        "MAE": 111.0901467838535,
+        "RMSE": 130.82008612746057,
+        "R2": 0.1745468070612528,
+        "MdAPE_%": 21.154184918756098,
+        "bias": -14.267621486430007,
+        "n": 80
+      },
+      "recommended_after_levels_prediction_error": {
+        "MAE": 72.42056497809926,
+        "RMSE": 91.17585262093196,
+        "R2": 0.3109163214300835,
+        "MdAPE_%": 12.571842268956962,
+        "bias": -9.149015799413295,
+        "n": 80
+      },
+      "standard_dosing": {
+        "pct_within_400_600": 10.0,
+        "pct_below_400": 16.25,
+        "pct_above_600": 73.75,
+        "pct_above_800": 50.0,
+        "median_auc": 799.10385
+      },
+      "recommended_a_priori": {
+        "pct_within_400_600": 45.0,
+        "pct_below_400": 27.500000000000004,
+        "pct_above_600": 27.500000000000004,
+        "pct_above_800": 1.25,
+        "median_auc": 502.5790027240572
+      },
+      "recommended_after_levels": {
+        "pct_within_400_600": 66.25,
+        "pct_below_400": 16.25,
+        "pct_above_600": 17.5,
+        "pct_above_800": 0.0,
+        "median_auc": 489.1794172410289
+      },
+      "dataset_auc_targeted": {
+        "pct_within_400_600": 65.0,
+        "pct_below_400": 8.75,
+        "pct_above_600": 26.25,
+        "pct_above_800": 26.25,
+        "median_auc": 534.75965
+      },
+      "_note": "dataset_auc_targeted was designed by the simulator using the latent clearance (an oracle-informed reference, not achievable in practice)."
+    }
+  },
+  "features": [
+    "age",
+    "log_weight",
+    "log_crcl",
+    "icu",
+    "rrt",
+    "arc"
+  ],
+  "sklearn_version": "1.9.1",
+  "python_version": "3.13.16"
+}
